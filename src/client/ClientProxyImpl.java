@@ -1,8 +1,6 @@
 package client;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
-
 import stringProcessors.HalloweenCommandProcessor;
 import util.interactiveMethodInvocation.IPCMechanism;
 
@@ -21,7 +19,9 @@ public class ClientProxyImpl implements RMIClientProxy, GIPCClientProxy {
 
 	@Override
 	public void processCommand(String cmd) {
-		commandProcessor.processCommand(cmd);
+		if(!paramListener.isWaitForBroadcastConsensus() && !paramListener.isWaitForIPCMechanismConsensus()) {
+			commandProcessor.processCommand(cmd);
+		}
 	}
 	
 	public String getName(){
@@ -60,6 +60,7 @@ public class ClientProxyImpl implements RMIClientProxy, GIPCClientProxy {
 	public void acceptAtomicRequest(boolean isAtomic) throws RemoteException {
 		paramListener.setWaitForBroadcastConsensus(false);
 		try {
+			System.out.println("accepting atomic request" + clientName);
 			setAtomicBroadcast(isAtomic);
 		} catch (RemoteException e) {
 			e.printStackTrace();

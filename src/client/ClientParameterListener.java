@@ -25,7 +25,6 @@ public class ClientParameterListener extends AnAbstractSimulationParametersBean{
 		commandProcessor.setConnectedToSimulation(!newValue);
 		setAtomicBroadcast(newValue);
 		if(isBroadcastMetaState()) {
-			System.out.println(getConsensusAlgorithm());
 			if(getConsensusAlgorithm() == ConsensusAlgorithm.CENTRALIZED_ASYNCHRONOUS) {
 				try {
 					client.remoteRMIServer.setAtomicBroadcast(newValue, client.clientName);

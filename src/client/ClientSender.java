@@ -8,7 +8,8 @@ import java.rmi.RemoteException;
 
 import inputport.nio.manager.NIOManagerFactory;
 import stringProcessors.HalloweenCommandProcessor;
-import util.interactiveMethodInvocation.IPCMechanism;
+import util.misc.ThreadSupport;
+
 
 public class ClientSender implements PropertyChangeListener {
 	
@@ -28,15 +29,16 @@ public class ClientSender implements PropertyChangeListener {
 	@Override
 	public void propertyChange(PropertyChangeEvent anEvent){
 		
+		
 		if (!anEvent.getPropertyName().equals("InputString")) return;
 
-		
 		String cmd = anEvent.getNewValue().toString();
 		boolean isAtomic = paramListener.isAtomicBroadcast();
 		
 		if(!paramListener.getLocalProcessing()) {
 			switch(paramListener.getIPCMechanism()) {
 			case GIPC:
+				ThreadSupport.sleep(paramListener.getDelay());
 				client.remoteGIPCServer.gipcSimulationCommand(cmd, isAtomic, client.clientName);
 				break;
 			case NIO:
@@ -52,9 +54,9 @@ public class ClientSender implements PropertyChangeListener {
 			default:
 				client.remoteGIPCServer.gipcSimulationCommand(cmd, isAtomic, client.clientName);
 				break;
-			}
-			
+			}	
 		}
+		paramListener.setDelay(0);
 	}
 	
 	public void sendCommand(String cmd, boolean isAtomic) {

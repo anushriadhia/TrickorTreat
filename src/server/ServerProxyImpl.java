@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
-import client.ClientProxyImpl;
 import client.GIPCClientProxy;
 import client.RMIClientProxy;
 import util.interactiveMethodInvocation.IPCMechanism;
@@ -32,7 +31,7 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	@Override
 	public void rmiSimulationCommand(String cmd, boolean isAtomic, String clientName) throws RemoteException {
 		RMIclientMap.forEach((k,v) -> {
-			if(isAtomic || !isAtomic && k!=clientName) {
+			if(isAtomic ||!k.equals(clientName)) {
 				try {
 					v.processCommand(cmd);
 				} catch (RemoteException e) {
@@ -56,7 +55,7 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	@Override
 	public void setAtomicBroadcast(boolean isAtomic, String clientName) throws RemoteException {
 		RMIclientMap.forEach((k,v)-> {
-			if(k!=clientName) {
+			if(!k.equals(clientName)) {
 				try {
 					v.setAtomicBroadcast(isAtomic);
 				} catch (RemoteException e) {
@@ -69,7 +68,7 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	@Override
 	public void setIPCMechanism(IPCMechanism ipc, String clientName) throws RemoteException {
 		RMIclientMap.forEach((k,v)-> {
-			if(k!=clientName) {
+			if(!k.equals(clientName)) {
 				try {
 					v.setIPCMechanism(ipc);
 				} catch (RemoteException e) {
@@ -86,7 +85,7 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	public void proposeAtomic(boolean isAtomic, String clientName) throws RemoteException {
 		boolean changeAtomic = true;
 		for(String name: RMIclientMap.keySet()) {
-			if(name!=clientName) {
+			if(!name.equals(clientName)) {
 				if(!RMIclientMap.get(name).atomicRequest()) {
 					changeAtomic = false;
 					break;
@@ -106,7 +105,7 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	public void proposeIPC(IPCMechanism ipc, String clientName) throws RemoteException {
 		boolean changeIPC = true;
 		for(String name: RMIclientMap.keySet()) {
-			if(name!=clientName) {
+			if(!name.equals(clientName)) {
 				if(!RMIclientMap.get(name).ipcRequest()) {
 					changeIPC = false;
 					break;
