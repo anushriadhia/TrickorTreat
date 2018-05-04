@@ -24,7 +24,7 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	public void gipcSimulationCommand(String cmd, boolean isAtomic, String clientName) {
 		System.out.println("GIPC send");
 		GIPCclientMap.forEach((k,v) -> {
-			if(isAtomic || !isAtomic && k!=clientName) {
+			if(isAtomic ||!k.equals(clientName)) {
 				System.out.println("sending command to " + k);
 				v.processCommand(cmd);
 			}
