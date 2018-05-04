@@ -14,7 +14,7 @@ public class Client3 {
 		NIOclient.launchClient(ClientArgsProcessor.getServerHost(args), 
 				ClientArgsProcessor.getServerPort(args), 
 				"Client3",
-				args);	
+				ClientArgsProcessor.getGIPCPort(args));	
 
 	}
 

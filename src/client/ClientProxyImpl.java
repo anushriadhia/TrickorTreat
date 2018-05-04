@@ -11,7 +11,6 @@ public class ClientProxyImpl implements RMIClientProxy, GIPCClientProxy {
 	ClientParameterListener paramListener;
 	
 	public ClientProxyImpl(HalloweenCommandProcessor commandProcessor, String clientName, ClientParameterListener paramListener) throws RemoteException {
-		super();
 		this.commandProcessor = commandProcessor;
 		this.clientName = clientName;
 		this.paramListener = paramListener;

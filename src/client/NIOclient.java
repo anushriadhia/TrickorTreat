@@ -55,8 +55,6 @@ public class NIOclient implements SocketChannelConnectListener{
 	ClientParameterListener paramListener;
 	
 	ArrayBlockingQueue<CommandObject> boundedBuffer;
-	
-	private static String[] mainArgs;
 		
 	private static int BUFFER_SIZE = 5000;
 	
@@ -69,7 +67,7 @@ public class NIOclient implements SocketChannelConnectListener{
 	}
 	
 	
-	public void initialize(String aServerHost, int aServerPort) throws RemoteException{	
+	public void initialize(String aServerHost, int aServerPort, int gipcPort) throws RemoteException{	
 		
 		commandProcessor = createSimulation(Simulation.SIMULATION1_PREFIX);	
 				
@@ -82,7 +80,7 @@ public class NIOclient implements SocketChannelConnectListener{
 		connectToServer(aServerHost, aServerPort);
 		
 		RMIstartup();
-		GIPCstartup();
+		GIPCstartup(aServerHost, gipcPort);
 		
 		new Thread(processor).start();
 		
@@ -182,11 +180,9 @@ public class NIOclient implements SocketChannelConnectListener{
 		
 	}
 	
-	public void GIPCstartup() {
+	public void GIPCstartup(String serverHost, int gipcPort) {
 		ACachingAbstractRPCProxyInvocationHandler.setInvokeObjectMethodsRemotely(false);
-		GIPCRegistry gipcRegistry = GIPCLocateRegistry.getRegistry(ClientArgsProcessor.getServerHost(mainArgs), 
-				ClientArgsProcessor.getGIPCPort(mainArgs),
-				"GIPCServer");
+		GIPCRegistry gipcRegistry = GIPCLocateRegistry.getRegistry(serverHost, gipcPort, "GIPCServer");
 		if (gipcRegistry == null) {
 			System.exit(-1);
 		}
@@ -203,9 +199,7 @@ public class NIOclient implements SocketChannelConnectListener{
 	}
 	
 	public static void launchClient(String aServerHost, int aServerPort,
-			String aClientName, String[] args) throws RemoteException {
-		
-		mainArgs = args;
+			String aClientName, int gipcPort) throws RemoteException {
 		/*
 		 * Put these two in your clients also
 		 */
@@ -213,14 +207,17 @@ public class NIOclient implements SocketChannelConnectListener{
 		BeanTraceUtility.setTracing();
 		NIOTraceUtility.setTracing();
 		NIOclient aClient = new NIOclient(aClientName);
-		aClient.initialize(aServerHost, aServerPort);		
+		aClient.initialize(aServerHost, aServerPort, gipcPort);
+		
+		
 	}
 	
 
 	public static void main(String[] args) throws RemoteException {	
 		launchClient(ClientArgsProcessor.getServerHost(args),
 				ClientArgsProcessor.getServerPort(args),
-				ClientArgsProcessor.getClientName(args), args);
+				ClientArgsProcessor.getClientName(args),
+				ClientArgsProcessor.getGIPCPort(args));
 	}
 
 
