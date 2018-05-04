@@ -1,6 +1,7 @@
 package client;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 import assignments.util.inputParameters.AnAbstractSimulationParametersBean;
 import stringProcessors.HalloweenCommandProcessor;
@@ -43,7 +44,27 @@ public class ClientParameterListener extends AnAbstractSimulationParametersBean{
 	}
 
 	@Override
-	public void experimentInput() {		
+	public void experimentInput() {	
+		ArrayList<String> times = new ArrayList<String>();
+		
+		runExperiment(IPCMechanism.NIO, true, false, times);
+		runExperiment(IPCMechanism.NIO, false, false, times );
+		runExperiment(IPCMechanism.NIO, false, true, times);
+		runExperiment(IPCMechanism.RMI, true, false, times);
+		runExperiment(IPCMechanism.RMI, false, false, times);
+		runExperiment(IPCMechanism.RMI, false, true, times);
+		runExperiment(IPCMechanism.GIPC, true, false, times);
+		runExperiment(IPCMechanism.GIPC, false, false, times);
+		runExperiment(IPCMechanism.GIPC, false, true, times);
+		
+		times.forEach((x)-> System.out.println(x));
+	}
+	
+	public void runExperiment(IPCMechanism ipc, boolean isLocal, boolean isAtomic, ArrayList<String> timeList) {
+		setLocalProcessingOnly(isLocal);
+		setIPCMechanism(ipc);
+		setAtomicBroadcast(isAtomic);
+		
 		long startTime = System.currentTimeMillis();
 		PerformanceExperimentStarted.newCase(this, startTime, 100);
 		
@@ -54,7 +75,7 @@ public class ClientParameterListener extends AnAbstractSimulationParametersBean{
 		long endTime = System.currentTimeMillis();
 		PerformanceExperimentEnded.newCase(this, startTime, endTime, endTime - startTime, 100);
 		
-		System.out.println("Time took: "+ (endTime-startTime));
+		timeList.add("Time took for ipc: " + ipc + ", is local: " + isLocal + ", is atomic: " + isAtomic + ", is " + (endTime-startTime));
 		
 	}
 
