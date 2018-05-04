@@ -3,6 +3,7 @@ package server;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import client.GIPCClientProxy;
 import client.RMIClientProxy;
@@ -20,7 +21,7 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	}
 
 	@Override
-	public synchronized void gipcSimulationCommand(String cmd, boolean isAtomic, String clientName) {
+	public void gipcSimulationCommand(String cmd, boolean isAtomic, String clientName) {
 		GIPCclientMap.forEach((k,v) -> {
 			if(isAtomic ||!k.equals(clientName)) {
 				v.processCommand(cmd);
@@ -29,7 +30,7 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	}
 	
 	@Override
-	public synchronized void rmiSimulationCommand(String cmd, boolean isAtomic, String clientName) throws RemoteException {
+	public void rmiSimulationCommand(String cmd, boolean isAtomic, String clientName) throws RemoteException {
 		RMIclientMap.forEach((k,v) -> {
 			if(isAtomic ||!k.equals(clientName)) {
 				try {
@@ -42,22 +43,22 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	}
 
 	@Override
-	public synchronized void registerToRMIServer(RMIClientProxy client, String clientName) throws RemoteException {
+	public void registerToRMIServer(RMIClientProxy client, String clientName) throws RemoteException {
 		RMIclientMap.put(clientName, client);
 		
 	}
 	
 	@Override
-	public synchronized void registerToGIPCServer(GIPCClientProxy client, String clientName) {
+	public void registerToGIPCServer(GIPCClientProxy client, String clientName) {
 		GIPCclientMap.put(clientName, client);
 	}
 
 	@Override
-	public synchronized void setAtomicBroadcast(boolean isAtomic, String clientName) throws RemoteException {
+	public void setAtomicBroadcast(boolean isAtomic, String clientName) throws RemoteException {
 		RMIclientMap.forEach((k,v)-> {
 			if(!k.equals(clientName)) {
 				try {
-					v.setAtomicBroadcast(isAtomic);
+					v.acceptAtomicRequest(isAtomic);
 				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
@@ -66,11 +67,11 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	}
 
 	@Override
-	public synchronized void setIPCMechanism(IPCMechanism ipc, String clientName) throws RemoteException {
+	public void setIPCMechanism(IPCMechanism ipc, String clientName) throws RemoteException {
 		RMIclientMap.forEach((k,v)-> {
 			if(!k.equals(clientName)) {
 				try {
-					v.setIPCMechanism(ipc);
+					v.acceptIPCRequest(ipc);
 				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
@@ -82,7 +83,7 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	
 
 	@Override
-	public synchronized void proposeAtomic(boolean isAtomic, String clientName) throws RemoteException {
+	public void proposeAtomic(boolean isAtomic, String clientName) throws RemoteException {
 		boolean changeAtomic = true;
 		for(String name: RMIclientMap.keySet()) {
 			if(!name.equals(clientName)) {
@@ -102,7 +103,7 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 	}
 
 	@Override
-	public synchronized void proposeIPC(IPCMechanism ipc, String clientName) throws RemoteException {
+	public void proposeIPC(IPCMechanism ipc, String clientName) throws RemoteException {
 		boolean changeIPC = true;
 		for(String name: RMIclientMap.keySet()) {
 			if(!name.equals(clientName)) {

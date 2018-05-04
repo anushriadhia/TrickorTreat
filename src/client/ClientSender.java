@@ -38,7 +38,6 @@ public class ClientSender implements PropertyChangeListener {
 		if(!paramListener.getLocalProcessing()) {
 			switch(paramListener.getIPCMechanism()) {
 			case GIPC:
-				ThreadSupport.sleep(paramListener.getDelay());
 				client.remoteGIPCServer.gipcSimulationCommand(cmd, isAtomic, client.clientName);
 				break;
 			case NIO:
