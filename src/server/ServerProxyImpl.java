@@ -22,10 +22,8 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 
 	@Override
 	public void gipcSimulationCommand(String cmd, boolean isAtomic, String clientName) {
-		System.out.println("GIPC send");
 		GIPCclientMap.forEach((k,v) -> {
 			if(isAtomic ||!k.equals(clientName)) {
-				System.out.println("sending command to " + k);
 				v.processCommand(cmd);
 			}
 		});
@@ -57,7 +55,6 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 
 	@Override
 	public void setAtomicBroadcast(boolean isAtomic, String clientName) throws RemoteException {
-		System.out.println("setting atomic broadcast universally to "+ isAtomic);
 		RMIclientMap.forEach((k,v)-> {
 			if(k!=clientName) {
 				try {
@@ -71,7 +68,6 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 
 	@Override
 	public void setIPCMechanism(IPCMechanism ipc, String clientName) throws RemoteException {
-		System.out.println("setting ipc mechanism universally to "+ ipc);
 		RMIclientMap.forEach((k,v)-> {
 			if(k!=clientName) {
 				try {
@@ -92,14 +88,12 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 		for(String name: RMIclientMap.keySet()) {
 			if(name!=clientName) {
 				if(!RMIclientMap.get(name).atomicRequest()) {
-					System.out.println("consensus not reached: " + clientName + " refused");
 					changeAtomic = false;
 					break;
 				}
 			}
 		}
 		if(changeAtomic) {
-			System.out.println("Consensus reached");
 			try {
 				setAtomicBroadcast(isAtomic, clientName);
 			} catch (RemoteException e) {
@@ -114,14 +108,12 @@ public class ServerProxyImpl extends UnicastRemoteObject implements RMIServerPro
 		for(String name: RMIclientMap.keySet()) {
 			if(name!=clientName) {
 				if(!RMIclientMap.get(name).ipcRequest()) {
-					System.out.println("consensus not reached: " + clientName + " refused");
 					changeIPC = false;
 					break;
 				}
 			}
 		}
 		if(changeIPC) {
-			System.out.println("Consensus reached");
 			try {
 				setIPCMechanism(ipc, clientName);
 			} catch (RemoteException e) {

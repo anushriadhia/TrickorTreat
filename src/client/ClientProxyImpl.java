@@ -46,23 +46,18 @@ public class ClientProxyImpl implements RMIClientProxy, GIPCClientProxy {
 
 	@Override
 	public boolean atomicRequest() throws RemoteException {
-		System.out.println("broadcast request received");
 		paramListener.setWaitForBroadcastConsensus(true);
 		return !paramListener.isRejectMetaStateChange();
 	}
 
 	@Override
 	public boolean ipcRequest() throws RemoteException {
-		System.out.println("ipc request received");
-
 		paramListener.setWaitForIPCMechanismConsensus(true);
 		return !paramListener.isRejectMetaStateChange();
 	}
 
 	@Override
 	public void acceptAtomicRequest(boolean isAtomic) throws RemoteException {
-		System.out.println("broadcast set to " + isAtomic);
-
 		paramListener.setWaitForBroadcastConsensus(false);
 		try {
 			setAtomicBroadcast(isAtomic);
@@ -73,8 +68,6 @@ public class ClientProxyImpl implements RMIClientProxy, GIPCClientProxy {
 
 	@Override
 	public void acceptIPCRequest(IPCMechanism ipc) throws RemoteException {
-		System.out.println("ipc set to "+ipc);
-
 		paramListener.setWaitForIPCMechanismConsensus(false);
 		try {
 			setIPCMechanism(ipc);
